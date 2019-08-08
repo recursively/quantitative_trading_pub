@@ -21,27 +21,30 @@ class StockAnalyzer():
     async def iwc_filter(self):
         browser = await launch({'headless': True})
         page = await browser.newPage()
-        await page.goto(self.base_url.format(self.query))
-        
-        await page.waitForNavigation()
-        page_count = 1
-        while page_count < 3:
-            page_count += 1
-            all_targets = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[*]/td[4]/div/a')
+        try:
+            await page.goto(self.base_url.format(self.query))
+            await page.waitForNavigation()
+        except Exception as e:
+            print(e)
+        finally:
+            page_count = 1
+            while page_count < 3:
+                page_count += 1
+                all_targets = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[*]/td[4]/div/a')
 
-            for i in range(len(all_targets)):
-                all_elements = (await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[1]/div/div/div[2]/table/tbody/tr[{}]/td[position()>2]'.format(i+1)))
-                stock_code = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[{}]/td[3]/div'.format(i+1))
-                # print(await (await all_targets[i].getProperty('textContent')).jsonValue(), ":", end='')
-                elements_list = [(await (await item.getProperty('textContent')).jsonValue()).strip() for item in all_elements]
-                while '' in elements_list: elements_list.remove('')
-                self.stock_dict[await (await all_targets[i].getProperty('textContent')).jsonValue() + ' ' + await (await stock_code[0].getProperty('textContent')).jsonValue()] = str(elements_list)
+                for i in range(len(all_targets)):
+                    all_elements = (await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[1]/div/div/div[2]/table/tbody/tr[{}]/td[position()>2]'.format(i+1)))
+                    stock_code = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[{}]/td[3]/div'.format(i+1))
+                    # print(await (await all_targets[i].getProperty('textContent')).jsonValue(), ":", end='')
+                    elements_list = [(await (await item.getProperty('textContent')).jsonValue()).strip() for item in all_elements]
+                    while '' in elements_list: elements_list.remove('')
+                    self.stock_dict[await (await all_targets[i].getProperty('textContent')).jsonValue() + ' ' + await (await stock_code[0].getProperty('textContent')).jsonValue()] = str(elements_list)
 
-            try:
-                await page.click('#next')
-                await page.waitFor(1000)
-            except Exception as e:
-                pass
+                try:
+                    await page.click('#next')
+                    await page.waitFor(1000)
+                except Exception as e:
+                    pass
 
         await browser.close()
 
