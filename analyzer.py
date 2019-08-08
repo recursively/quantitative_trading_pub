@@ -30,7 +30,6 @@ class StockAnalyzer():
             all_targets = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[*]/td[4]/div/a')
 
             for i in range(len(all_targets)):
-                # TODO: 判断股票与数据相对应 股票名与代码对应
                 all_elements = (await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[1]/div/div/div[2]/table/tbody/tr[{}]/td[position()>2]'.format(i+1)))
                 stock_code = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[{}]/td[3]/div'.format(i+1))
                 # print(await (await all_targets[i].getProperty('textContent')).jsonValue(), ":", end='')
