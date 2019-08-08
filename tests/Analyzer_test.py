@@ -20,10 +20,9 @@ class StockAnalyzerTestCase(unittest.TestCase):
         try:
             loop = asyncio.get_event_loop()
             loop.run_until_complete(self.Analyzer_cn.iwc_filter())
-            random_item = self.stock_dict.popitem()
         except:
             pass
-        assert type(int(random_item[0].split()[-1])) == int
+        assert type(int(self.stock_dict.popitem()[0].split()[-1])) == int
 
 
 if __name__ == '__main__':
