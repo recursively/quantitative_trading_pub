@@ -15,4 +15,7 @@ test_script:
   - "%PYTHON%\\python.exe -m coverage run tests/Analyzer_test.py"
 
 after_test:
-  - codecov
+  - ps: |
+      $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+      bash codecov.sh -f "coverage.xml"
