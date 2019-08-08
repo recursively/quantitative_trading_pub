@@ -13,7 +13,7 @@ build: off
 test_script:
   - "echo %PYTHONPATH%"
   - "%PYTHON%\\python.exe -m coverage run tests/Analyzer_test.py"
-  - "%PYTHON%\\python.exe -m coverage report -m"
+  - "%PYTHON%\\python.exe -m coverage xml"
 
 after_test:
   - "%PYTHON%\\python.exe -m codecov"
