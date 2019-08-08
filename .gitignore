@@ -3,3 +3,4 @@ __pycache__/
 tempCodeRunnerFile.py
 test.py
 .coverage
+coverage.xml

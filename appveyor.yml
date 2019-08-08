@@ -12,4 +12,7 @@ build: off
 
 test_script:
   - "echo %PYTHONPATH%"
-  - "%PYTHON%\\python.exe tests/Analyzer_test.py"
+  - "coverage run tests/Analyzer_test.py"
+
+after_test:
+  - "codecov"

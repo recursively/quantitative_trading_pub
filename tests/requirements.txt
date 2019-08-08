@@ -4,3 +4,4 @@ pyppeteer
 lxml
 numpy
 futu-api
+coverage
