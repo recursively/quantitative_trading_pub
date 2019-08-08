@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from analyzer import StockAnalyzer
 from stock_filter import StockAnalyzerA
 import config
+import asyncio
 
 
 class StockAnalyzerTestCase(unittest.TestCase):
