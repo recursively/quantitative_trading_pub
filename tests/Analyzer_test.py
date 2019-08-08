@@ -22,8 +22,7 @@ class StockAnalyzerTestCase(unittest.TestCase):
             loop.run_until_complete(self.Analyzer_cn.iwc_filter())
         except Exception as e:
             print(e)
-        assert 1 == 2
-        # assert type(int(self.Analyzer_cn.stock_dict.popitem()[0].split()[-1])) == int
+        assert type(int(self.Analyzer_cn.stock_dict.popitem()[0].split()[-1])) == int
 
 
 if __name__ == '__main__':
