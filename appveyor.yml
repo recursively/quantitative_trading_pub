@@ -3,12 +3,13 @@ environment:
     - PYTHON: "C:\\Python36-x64"
       PYTHON_VERSION: "3.6.x" # currently 3.6.6
       PYTHON_ARCH: "64"
-      PYTHONPATH: "C:\\Python36-x64"
 
 install:
+  set PYTHONPATH=%PYTHONHOME%
   - "%PYTHON%\\python.exe -m pip install -r tests/requirements.txt"
 
 build: off
 
 test_script:
+  - "cd "
   - "%PYTHON%\\python.exe tests/Analyzer_test.py"
