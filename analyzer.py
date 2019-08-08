@@ -119,5 +119,5 @@ class StockAnalyzer():
         print('Qualified stocks: ')
         for i in self.qualified_stocks:
             print(i)
-        self.price_calc(self.qualified_stocks)
+        # self.price_calc(self.qualified_stocks)
         

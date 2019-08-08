@@ -1,0 +1,13 @@
+environment:
+  matrix:
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.x" # currently 3.6.6
+      PYTHON_ARCH: "64"
+
+install:
+  - "%PYTHON%\\python.exe -m pip install -r tests/requirements.txt"
+
+build: off
+
+test_script:
+  - "%PYTHON%\\python.exe tests/Analyzer_test.py"

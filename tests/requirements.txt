@@ -1,0 +1,6 @@
+requests
+codecov
+pyppeteer
+lxml
+numpy
+futu-api
