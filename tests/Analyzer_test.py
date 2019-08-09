@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from analyzer import StockAnalyzer, Quote, myfunc
+from analyzer import StockAnalyzer
 from stock_filter import StockAnalyzerA, StockAnalyzerHK, StockAnalyzerUS
 import config
 import asyncio
