@@ -1,6 +1,6 @@
 import unittest
-from unittest.mock import MagicMock
-from analyzer import StockAnalyzer
+from unittest.mock import MagicMock, patch
+from analyzer import StockAnalyzer, Quote, myfunc
 from stock_filter import StockAnalyzerA, StockAnalyzerHK, StockAnalyzerUS
 import config
 import asyncio
@@ -63,9 +63,11 @@ class StockAnalyzerTestCase(unittest.TestCase):
         us_treasury = StockAnalyzer.treasury_fetch(config.us_treasury, config.treasury_path)
         self.assertTrue(1 < max(cn_treasury, us_treasury) < 5)
 
-    def test_price_calculation(self):
+    @patch('analyzer.Quote')
+    def test_price_calculation(self, mock_tmp):
         def side_effect(quote, market, stock_code):
-            print('calling side effect eeee')
+            mock_tmp.return_value.__init__.return_value.name = 'initialing'
+            mock_tmp.return_value.__enter__.return_value.name = 'entering'
             info_list = ['SH.600519', 962.03, 30.679, 14.539]
             return info_list
         StockAnalyzer.get_stock_info = MagicMock(side_effect=side_effect)

@@ -3,7 +3,6 @@ import asyncio
 from lxml import etree
 import requests
 import config
-import time
 from futu import *
 from pyppeteer import launch
 
@@ -34,7 +33,7 @@ class StockAnalyzer():
         browser = await launch({'headless': True})
         page = await browser.newPage()
         await page.goto(self.base_url.format(self.query))
-        
+
         await page.waitForNavigation()
         page_count = 1
         while page_count < 3:
@@ -65,7 +64,7 @@ class StockAnalyzer():
         res = requests.get(url, headers=config.headers)
         root = etree.HTML(res.content)
         treasury_yield = float(root.xpath(path)[0])
-        
+
         return treasury_yield
 
     @staticmethod
