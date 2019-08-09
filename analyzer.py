@@ -31,7 +31,7 @@ class StockAnalyzer():
         self.gprice = 0
 
     async def iwc_filter(self):
-        browser = await launch({'headless': True})
+        browser = await launch({'headless': True, 'args': ['--disable-dev-shm-usage']})
         page = await browser.newPage()
         await page.goto(self.base_url.format(self.query), timeout=60000)
 

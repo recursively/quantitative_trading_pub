@@ -31,7 +31,7 @@ class StockAnalyzerA(StockAnalyzer):
         return recent_ratio
 
     async def extract_debts(self, stock_code):
-        browser = await launch({'headless': True})
+        browser = await launch({'headless': True, 'args': ['--disable-dev-shm-usage']})
         page = await browser.newPage()
         await page.goto(self.debt_url.format(stock_code), {'waitUntil': "networkidle2"}, timeout=60000)
         await page.waitForSelector('#cwzbTable')
@@ -87,7 +87,7 @@ class StockAnalyzerHK(StockAnalyzer):
         # TODO: 派息比率过高的问题？
         # TODO: 只在开头打开一次browser 异步效果？
         # browser = await launch({'executablePath': exepath, 'headless': True})
-        browser = await launch({'headless': True})
+        browser = await launch({'headless': True, 'args': ['--disable-dev-shm-usage']})
         page = await browser.newPage()
         try:
             await page.goto(self.bonus_url.format(stock_code), {'waitUntil': "networkidle2"}, timeout=10000)
@@ -143,7 +143,7 @@ class StockAnalyzerUS(StockAnalyzer):
 
     # 适用于所有market派息比率计算
     async def extract_bonus(self, stock_tag):
-        browser = await launch({'headless': True})
+        browser = await launch({'headless': True, 'args': ['--disable-dev-shm-usage']})
         page = await browser.newPage()
         try:
             await page.goto(self.bonus_url.format(config.bonus_general_query.format(config.year-5, config.year-1, stock_tag)), timeout=60000)
