@@ -67,12 +67,17 @@ class StockAnalyzerTestCase(unittest.TestCase):
     @patch('analyzer.Quote')
     def test_price_calculation(self, mock_tmp):
         mock_tmp.return_value.__enter__.return_value.name = 'entering'
+        call_count = 0
         def side_effect(quote, market, stock_code):
+            nonlocal call_count
+            if call_count == 5:
+                raise Exception('Intentionally raise an Exception to simulate the different market.')
+            call_count += 1
             info_list = ['SH.600519', 962.03, 30.679, 14.539]
             return info_list
         StockAnalyzer.get_stock_info = MagicMock(side_effect=side_effect)
         start = time.perf_counter()
-        self.Analyzer_cn.price_calc(['stock 000000'] * 10)
+        self.Analyzer_cn.price_calc(['stock 000000'] * 15)
         stop = time.perf_counter()
         self.assertEqual(int(self.Analyzer_cn.gprice), 470)
         self.assertTrue(stop - start >= 30)
