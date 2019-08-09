@@ -34,7 +34,7 @@ class StockAnalyzer():
         page = await browser.newPage()
         await page.goto(self.base_url.format(self.query), timeout=60000)
 
-        await page.waitForNavigation()
+        await page.waitForNavigation(timeout=60000)
         page_count = 1
         while page_count < 3:
             page_count += 1
