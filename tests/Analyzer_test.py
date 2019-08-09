@@ -5,6 +5,7 @@ from stock_filter import StockAnalyzerA, StockAnalyzerHK, StockAnalyzerUS
 import config
 import asyncio
 import numpy as np
+import time
 
 
 class StockAnalyzerTestCase(unittest.TestCase):
@@ -70,8 +71,11 @@ class StockAnalyzerTestCase(unittest.TestCase):
             info_list = ['SH.600519', 962.03, 30.679, 14.539]
             return info_list
         StockAnalyzer.get_stock_info = MagicMock(side_effect=side_effect)
-        self.Analyzer_cn.price_calc(['stock 000000'])
-        self.assertTrue(int(self.Analyzer_cn.gprice), 470)
+        start = time.perf_counter()
+        self.Analyzer_cn.price_calc(['stock 000000'] * 10)
+        stop = time.perf_counter()
+        self.assertEqual(int(self.Analyzer_cn.gprice), 470)
+        self.assertTrue(stop - start >= 30)
 
 
 if __name__ == '__main__':
