@@ -8,6 +8,17 @@ from futu import *
 from pyppeteer import launch
 
 
+class Quote():
+    def __init__(self):
+        self.quote = OpenQuoteContext(host='127.0.0.1', port=11111)
+
+    def __enter__(self):
+        return self.quote
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.quote.close()
+
+
 class StockAnalyzer():
     def __init__(self, base_url, query, bonus_url, debt_url):
         self.base_url = base_url
@@ -17,6 +28,7 @@ class StockAnalyzer():
         self.stock_dict = {}
         self.debt_ratio = []
         self.qualified_stocks = []
+        self.gprice = 0
 
     async def iwc_filter(self):
         browser = await launch({'headless': True})
@@ -45,71 +57,80 @@ class StockAnalyzer():
 
         await browser.close()
 
-    def extract_bonus(self, stock_code):
-        raise Exception("extract_bonus not implemented.")
+    def judgement(self):
+        raise Exception("judgment not implemented.")
 
-    def treasury_fetch(self, url, path):
+    @staticmethod
+    def treasury_fetch(url, path):
         res = requests.get(url, headers=config.headers)
         root = etree.HTML(res.content)
         treasury_yield = float(root.xpath(path)[0])
         
         return treasury_yield
 
-    def price_calc(self, stocks):
-        raise Exception("price_calc not implemented.")
+    @staticmethod
+    def get_stock_info(quote, market, stock_code):
+        if market == 'SH':
+            return quote.get_market_snapshot(['SH.{}'.format(stock_code)])[1][
+                ['code', 'last_price', 'pe_ttm_ratio', 'dividend_ttm']].values[0]
+        if market == 'SZ':
+            return quote.get_market_snapshot(['SZ.{}'.format(stock_code)])[1][
+                ['code', 'last_price', 'pe_ttm_ratio', 'dividend_ttm']].values[0]
+        if market == 'HK':
+            return quote.get_market_snapshot(['HK.{}'.format(stock_code)])[1][
+                ['code', 'last_price', 'pe_ttm_ratio', 'dividend_ttm']].values[0]
 
     def price_calc(self, stocks):
-        quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
+        treasury_yield = 0
+        treasury_dashboard = ''
         if type(self).__name__ == 'StockAnalyzerA':
-            treasury_yield = self.treasury_fetch(config.cn_treasury, config.treasury_path)
+            treasury_yield = StockAnalyzer.treasury_fetch(config.cn_treasury, config.treasury_path)
             treasury_dashboard = 'Treasury chosen: {:.3f}'.format(treasury_yield)
         if type(self).__name__ == 'StockAnalyzerHK':
-            cn_treasury = self.treasury_fetch(config.cn_treasury, config.treasury_path)
-            us_treasury = self.treasury_fetch(config.us_treasury, config.treasury_path)
+            cn_treasury = StockAnalyzer.treasury_fetch(config.cn_treasury, config.treasury_path)
+            us_treasury = StockAnalyzer.treasury_fetch(config.us_treasury, config.treasury_path)
             treasury_yield = max(cn_treasury, us_treasury)
             treasury_dashboard = 'Treasury chosen: {:.3f}  |  cn_treasury: {:.3f}, us_treasury: {:.3f}'.format(treasury_yield, cn_treasury, us_treasury)
         info_list = []
         # quote_ctx.get_market_snapshot(['SH.600519', 'SH.600660'])[1][['code', 'last_price', 'pe_ttm_ratio', 'dividend_ttm']].ix[[0]].values[0]
         request_count = 0
-        for stock in stocks:
-            code = stock.split()[1]
-            if type(self).__name__ == 'StockAnalyzerA':
-                try:
+        with Quote() as quote_ctx:
+            for stock in stocks:
+                code = stock.split()[-1]
+                if type(self).__name__ == 'StockAnalyzerA':
+                    try:
+                        if request_count < 11:  # 30s内请求10次
+                            request_count += 1
+                        else:
+                            print('Delaying 30 seconds to avoid being banned...')
+                            time.sleep(30)
+                            request_count = 1
+                        info_list = StockAnalyzer.get_stock_info(quote_ctx, 'SH', code)
+                    except Exception as e:
+                        try:
+                            if request_count < 11:
+                                request_count += 1
+                            else:
+                                print('Delaying 30 seconds to avoid being banned...')
+                                time.sleep(30)
+                                request_count = 1
+                            info_list = StockAnalyzer.get_stock_info(quote_ctx, 'SZ', code)
+                        except Exception as e:
+                            pass
+                elif type(self).__name__ == 'StockAnalyzerHK':
                     if request_count < 11:  # 30s内请求10次
                         request_count += 1
                     else:
                         print('Delaying 30 seconds to avoid being banned...')
                         time.sleep(30)
                         request_count = 1
-                    info_list = quote_ctx.get_market_snapshot(['SH.{}'.format(code)])[1][['code', 'last_price', 'pe_ttm_ratio', 'dividend_ttm']].values[0]
-                except Exception as e:
-                    try:
-                        if request_count < 11:
-                            request_count += 1
-                        else:
-                            print('Delaying 30 seconds to avoid being banned...')
-                            time.sleep(30)
-                            request_count = 1
-                        info_list = quote_ctx.get_market_snapshot(['SZ.{}'.format(code)])[1][['code', 'last_price', 'pe_ttm_ratio', 'dividend_ttm']].values[0]
-                    except Exception as e:
-                        pass
-            elif type(self).__name__ == 'StockAnalyzerHK':
-                if request_count < 11:  # 30s内请求10次
-                    request_count += 1
+                    info_list = StockAnalyzer.get_stock_info(quote_ctx, 'HK', code)
+                self.gprice = min(15 * info_list[1]/info_list[2], 100 * info_list[3]/treasury_yield)
+                if info_list[1] < self.gprice:
+                    print('{:<15s} Stock code: {} Last price: {:8.2f} Good price: {:8.2f}  √'.format(stock, info_list[0], info_list[1], self.gprice))
                 else:
-                    print('Delaying 30 seconds to avoid being banned...')
-                    time.sleep(30)
-                    request_count = 1
-                info_list = quote_ctx.get_market_snapshot(['HK.{}'.format(code)])[1][['code', 'last_price', 'pe_ttm_ratio', 'dividend_ttm']].values[0]
-            price = min(15 * info_list[1]/info_list[2], 100 * info_list[3]/treasury_yield)
-            if info_list[1] < price:
-                print('{:<15s} Stock code: {} Last price: {:8.2f} Good price: {:8.2f}  √'.format(stock, info_list[0], info_list[1], price))
-            else:
-                print('{:<15s} Stock code: {} Last price: {:8.2f} Good price: {:8.2f}'.format(stock, info_list[0], info_list[1], price))
-            info_list.fill(0)
-        print(treasury_dashboard)
-
-        quote_ctx.close()
+                    print('{:<15s} Stock code: {} Last price: {:8.2f} Good price: {:8.2f}'.format(stock, info_list[0], info_list[1], self.gprice))
+            print(treasury_dashboard)
 
     def start(self):
         loop = asyncio.get_event_loop()
@@ -119,4 +140,3 @@ class StockAnalyzer():
         for i in self.qualified_stocks:
             print(i)
         # self.price_calc(self.qualified_stocks)
-        

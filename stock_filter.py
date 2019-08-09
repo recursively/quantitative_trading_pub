@@ -94,7 +94,7 @@ class StockAnalyzerHK(StockAnalyzer):
             # await page.waitForSelector('#highcharts-0')
         # await page.waitFor(10000)
         except Exception as e:
-            print(e)
+            print('extract_bonus_HK error: ', e)
         finally:
             for i in range(6):
                 await page.hover('#highcharts-0 > svg > g.highcharts-series-group > g:nth-child(3) > rect:nth-child({})'.format(i+1))
