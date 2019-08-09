@@ -71,6 +71,7 @@ class StockAnalyzerTestCase(unittest.TestCase):
         def side_effect(quote, market, stock_code):
             nonlocal call_count
             if call_count == 5:
+                call_count += 1
                 raise Exception('Intentionally raise an Exception to simulate the different market.')
             call_count += 1
             info_list = ['SH.600519', 962.03, 30.679, 14.539]

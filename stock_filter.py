@@ -33,7 +33,7 @@ class StockAnalyzerA(StockAnalyzer):
     async def extract_debts(self, stock_code):
         browser = await launch({'headless': True})
         page = await browser.newPage()
-        await page.goto(self.debt_url.format(stock_code), {'waitUntil': "networkidle2"})
+        await page.goto(self.debt_url.format(stock_code), {'waitUntil': "networkidle2"}, timeout=60000)
         await page.waitForSelector('#cwzbTable')
         await page.click('#cwzbTable > div.scroll_container > ul > li:nth-child(2) > a')
 
