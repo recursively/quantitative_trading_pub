@@ -65,9 +65,8 @@ class StockAnalyzerTestCase(unittest.TestCase):
 
     @patch('analyzer.Quote')
     def test_price_calculation(self, mock_tmp):
+        mock_tmp.return_value.__enter__.return_value.name = 'entering'
         def side_effect(quote, market, stock_code):
-            mock_tmp.return_value.__init__.return_value.name = 'initialing'
-            mock_tmp.return_value.__enter__.return_value.name = 'entering'
             info_list = ['SH.600519', 962.03, 30.679, 14.539]
             return info_list
         StockAnalyzer.get_stock_info = MagicMock(side_effect=side_effect)
