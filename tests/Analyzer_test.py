@@ -69,6 +69,8 @@ class StockAnalyzerTestCase(unittest.TestCase):
         mock_tmp.return_value.__enter__.return_value.name = 'entering'
         call_count = 0
         def side_effect(quote, market, stock_code):
+            if market == 'SZ':
+                print('dealing with SZ market')
             nonlocal call_count
             if call_count == 5:
                 call_count += 1
@@ -78,11 +80,11 @@ class StockAnalyzerTestCase(unittest.TestCase):
             return info_list
         StockAnalyzer.get_stock_info = MagicMock(side_effect=side_effect)
         start = time.perf_counter()
-        self.Analyzer_cn.price_calc(['stock 000000'] * 10)
-        self.Analyzer_hk.price_calc(['stock 000000'] * 10)
+        self.Analyzer_cn.price_calc(['stock 000000'] * 15)
+        self.Analyzer_hk.price_calc(['stock 000000'] * 15)
         stop = time.perf_counter()
         self.assertEqual(int(self.Analyzer_cn.gprice), 470)
-        self.assertTrue(stop - start > 60)
+        self.assertTrue(stop - start >= 60)
 
 
 if __name__ == '__main__':
