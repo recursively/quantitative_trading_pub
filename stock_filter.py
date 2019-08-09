@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 import asyncio
-import time
 from pyppeteer import launch
 import requests
 from lxml import etree
 import numpy as np
-from futu import *
 import config
 from analyzer import StockAnalyzer
-import argparse
 
 
 class StockAnalyzerA(StockAnalyzer):
@@ -48,8 +45,6 @@ class StockAnalyzerA(StockAnalyzer):
 
     def judgement(self):
         # 添加深证市盈率判定
-        stock_code = ''
-        bonus_list = []
         for (k,v) in self.stock_dict.items():
             v_list = eval(v)
             roe, cashflow_profit, gross_profit = \
