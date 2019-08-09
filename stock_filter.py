@@ -145,33 +145,37 @@ class StockAnalyzerUS(StockAnalyzer):
     async def extract_bonus(self, stock_tag):
         browser = await launch({'headless': True})
         page = await browser.newPage()
-        await page.goto(self.bonus_url.format(config.bonus_general_query.format(config.year-5, config.year-1, stock_tag)))
-        await page.waitForNavigation()
-        all_elements = []
-        get_profit = False
-        profit = []
-        all_targets = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[*]/td[4]/div/a')
-        for i in range(len(all_targets)):
-            # TODO: 判断股票与数据相对应 股票名与代码对应
-            all_elements.append(await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[1]/div/div/div[2]/table/tbody/tr[{}]/td[position()>2]'.format(i+1)))
-            stock_code = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[{}]/td[3]/div'.format(i+1))
-            # print(await (await all_targets[i].getProperty('textContent')).jsonValue(), ":", end='')
-            elements_list = [(await (await item.getProperty('textContent')).jsonValue()).strip() for item in all_elements[i]]
-            if not get_profit:
-                profit = elements_list[1:6]
-                get_profit = True
-            while '' in elements_list: elements_list.remove('')
-            self.bonus_info[str(i) + stock_tag + ' ' + await (await stock_code[0].getProperty('textContent')).jsonValue()] = str(elements_list)
-        idx = 0
-        for value in self.bonus_info.values():
-            dividend = float(eval(value)[0].strip('万亿').replace(',', '')) / 10000 if '万' in eval(value)[0] else float(eval(value)[0].strip('万亿').replace(',', ''))
-            profit_val = float(profit[idx].strip('万亿').replace(',', '')) / 10000 if '万' in profit[idx] else float(profit[idx].strip('万亿').replace(',', ''))
-            try:
-                self.bonus_list.append(dividend / profit_val)
-            except Exception as e:
-                pass
-            idx += 1
-        self.bonus_info.clear()
+        try:
+            await page.goto(self.bonus_url.format(config.bonus_general_query.format(config.year-5, config.year-1, stock_tag)), timeout=60000)
+            await page.waitForNavigation()
+        except Exception as e:
+            print('extract_bonus_US error: ', e)
+        finally:
+            all_elements = []
+            get_profit = False
+            profit = []
+            all_targets = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[*]/td[4]/div/a')
+            for i in range(len(all_targets)):
+                # TODO: 判断股票与数据相对应 股票名与代码对应
+                all_elements.append(await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[1]/div/div/div[2]/table/tbody/tr[{}]/td[position()>2]'.format(i+1)))
+                stock_code = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[{}]/td[3]/div'.format(i+1))
+                # print(await (await all_targets[i].getProperty('textContent')).jsonValue(), ":", end='')
+                elements_list = [(await (await item.getProperty('textContent')).jsonValue()).strip() for item in all_elements[i]]
+                if not get_profit:
+                    profit = elements_list[1:6]
+                    get_profit = True
+                while '' in elements_list: elements_list.remove('')
+                self.bonus_info[str(i) + stock_tag + ' ' + await (await stock_code[0].getProperty('textContent')).jsonValue()] = str(elements_list)
+            idx = 0
+            for value in self.bonus_info.values():
+                dividend = float(eval(value)[0].strip('万亿').replace(',', '')) / 10000 if '万' in eval(value)[0] else float(eval(value)[0].strip('万亿').replace(',', ''))
+                profit_val = float(profit[idx].strip('万亿').replace(',', '')) / 10000 if '万' in profit[idx] else float(profit[idx].strip('万亿').replace(',', ''))
+                try:
+                    self.bonus_list.append(dividend / profit_val)
+                except Exception as e:
+                    pass
+                idx += 1
+            self.bonus_info.clear()
 
         await browser.close()
 
