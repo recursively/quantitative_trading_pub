@@ -32,7 +32,7 @@ class StockAnalyzer():
     async def iwc_filter(self):
         browser = await launch({'headless': True})
         page = await browser.newPage()
-        await page.goto(self.base_url.format(self.query))
+        await page.goto(self.base_url.format(self.query), timeout=60000)
 
         await page.waitForNavigation()
         page_count = 1
