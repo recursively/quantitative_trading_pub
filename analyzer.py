@@ -129,11 +129,11 @@ class StockAnalyzer():
                     print('{:<15s} Stock code: {} Last price: {:8.2f} Good price: {:8.2f}'.format(stock, info_list[0], info_list[1], self.gprice))
             print(treasury_dashboard)
 
-    def start(self):
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.iwc_filter())
-        self.judgement()
-        print('Qualified stocks: ')
-        for i in self.qualified_stocks:
-            print(i)
-        # self.price_calc(self.qualified_stocks)
+    # def start(self):
+    #     loop = asyncio.get_event_loop()
+    #     loop.run_until_complete(self.iwc_filter())
+    #     self.judgement()
+    #     print('Qualified stocks: ')
+    #     for i in self.qualified_stocks:
+    #         print(i)
+    #     self.price_calc(self.qualified_stocks)
