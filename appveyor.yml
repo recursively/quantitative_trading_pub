@@ -7,6 +7,7 @@ environment:
 install:
   - "SET PYTHONPATH=%PYTHONPATH%;%CD%"
   - "%PYTHON%\\python.exe -m pip install -r tests/requirements.txt"
+  - sed -i "s/self._url, max_size=None, loop=self._loop)/self._url, max_size=None, loop=self._loop, ping_interval=None, ping_timeout=None)/g" C:\Python36-x64\lib\site-packages\pyppeteer\connection.py
 
 build: off
 
