@@ -56,9 +56,9 @@ class StockAnalyzerA(StockAnalyzer):
             bonus_list = [_.strip('%') for _ in self.extract_bonus(k.split()[1])]
             if '--' in bonus_list:
                 continue
-            print(k, '\n', 'ROE：', roe, '\n', 'cashflow_profit：', cashflow_profit, '\n', 'gross_profit：', gross_profit)
+            print(k, '\n', 'ROE: ', roe, '\n', 'cashflow_profit: ', cashflow_profit, '\n', 'gross_profit: ', gross_profit)
             bonus_data = np.array(bonus_list).astype(np.float)
-            print('bonus_ratio：', bonus_data)
+            print('bonus_ratio: ', bonus_data)
             if np.mean(bonus_data) < 25 and (bonus_data > 25).sum() != bonus_data.size:
                 continue
             
@@ -71,7 +71,7 @@ class StockAnalyzerA(StockAnalyzer):
             if np.mean(debt_data) < 60 and debt_data[0] < 60:
                 self.qualified_stocks.append(k)
             # TODO: 增加延时
-            print('debt_ratio：', debt_data, '\n')
+            print('debt_ratio: ', debt_data, '\n')
             self.debt_ratio.clear()
 
 
@@ -132,7 +132,7 @@ class StockAnalyzerHK(StockAnalyzer):
             if np.mean(bonus_data) >= 30 and (bonus_data >= 30).sum() == bonus_data.size:
                 self.qualified_stocks.append(k)
             self.bonus_list.clear()
-            print('{}\nROE: {}\ncashflow_profit：{}\ngross_profit：{}\ndebt_ratio：{}\nbonus_ratio：{}\n'.format(k, roe, cashflow_profit, gross_profit, debt_ratio, bonus_data))
+            print('{}\nROE: {}\ncashflow_profit: {}\ngross_profit: {}\ndebt_ratio: {}\nbonus_ratio: {}\n'.format(k, roe, cashflow_profit, gross_profit, debt_ratio, bonus_data))
 
 
 class StockAnalyzerUS(StockAnalyzer):
@@ -198,4 +198,4 @@ class StockAnalyzerUS(StockAnalyzer):
             if np.mean(bonus_data) >= 0.2 and (bonus_data >= 0.2).sum() == bonus_data.size:
                 self.qualified_stocks.append(k)
             self.bonus_list.clear()
-            print('{}\nROE: {}\ncashflow_profit：{}\ngross_profit：{}\ndebt_ratio：{}\nbonus_ratio：{}\n'.format(k, roe, cashflow_profit, gross_profit, debt_ratio, bonus_data))
+            print('{}\nROE: {}\ncashflow_profit: {}\ngross_profit: {}\ndebt_ratio: {}\nbonus_ratio: {}\n'.format(k, roe, cashflow_profit, gross_profit, debt_ratio, bonus_data))
