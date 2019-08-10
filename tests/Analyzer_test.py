@@ -12,7 +12,7 @@ class StockAnalyzerTestCase(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(__class__, self).__init__(*args, **kwargs)
         self.stock_code_cn = '600519'
-        self.stock_code_hk = '00700'
+        self.stock_code_hk = '00799'
         self.stock_code_us = 'DIS'
         self.Analyzer_cn = StockAnalyzerA(config.base_url_A, config.query_A, config.bonus_url_A, config.debt_url_A)
         self.Analyzer_hk = StockAnalyzerHK(config.base_url_HK, config.query_HK, config.bonus_url_HK, None)
@@ -63,6 +63,32 @@ class StockAnalyzerTestCase(unittest.TestCase):
         cn_treasury = StockAnalyzer.treasury_fetch(config.cn_treasury, config.treasury_path)
         us_treasury = StockAnalyzer.treasury_fetch(config.us_treasury, config.treasury_path)
         self.assertTrue(1 < max(cn_treasury, us_treasury) < 5)
+
+    async def side_effect(self, stock_code):
+        if stock_code == self.stock_code_cn:
+            self.Analyzer_cn.debt_ratio = config.debt_ratio_sample_cn
+        if stock_code == self.stock_code_hk:
+            self.Analyzer_hk.bonus_list = config.bonus_list_sample_hk
+        if stock_code == self.stock_code_us:
+            self.Analyzer_us.bonus_list = config.bonus_list_sample_us
+
+    def test_judgement_cn(self):
+        StockAnalyzerA.extract_debts = MagicMock(side_effect=self.side_effect)
+        self.Analyzer_cn.stock_dict = config.origin_sample_cn
+        self.Analyzer_cn.judgement()
+        self.assertEqual(self.Analyzer_cn.qualified_stocks[0].split()[-1], self.stock_code_cn)
+
+    def test_judgement_hk(self):
+        StockAnalyzerHK.extract_bonus = MagicMock(side_effect=self.side_effect)
+        self.Analyzer_hk.stock_dict = config.origin_sample_hk
+        self.Analyzer_hk.judgement()
+        self.assertEqual(self.Analyzer_hk.qualified_stocks[0].split()[-1], self.stock_code_hk)
+
+    def test_judgement_us(self):
+        StockAnalyzerUS.extract_bonus = MagicMock(side_effect=self.side_effect)
+        self.Analyzer_us.stock_dict = config.origin_sample_us
+        self.Analyzer_us.judgement()
+        self.assertEqual(self.Analyzer_us.qualified_stocks[0].split()[-1], self.stock_code_us)
 
     @patch('analyzer.Quote')
     def test_price_calculation(self, mock_tmp):

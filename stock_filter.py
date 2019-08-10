@@ -90,7 +90,7 @@ class StockAnalyzerHK(StockAnalyzer):
         browser = await launch({'headless': True, 'args': ['--disable-dev-shm-usage']})
         page = await browser.newPage()
         try:
-            await page.goto(self.bonus_url.format(stock_code), {'waitUntil': "networkidle2"}, timeout=10000)
+            await page.goto(self.bonus_url.format(stock_code), {'waitUntil': "networkidle2"})
             # await page.waitForSelector('#highcharts-0')
         # await page.waitFor(10000)
         except Exception as e:
@@ -156,7 +156,6 @@ class StockAnalyzerUS(StockAnalyzer):
             profit = []
             all_targets = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[*]/td[4]/div/a')
             for i in range(len(all_targets)):
-                # TODO: 判断股票与数据相对应 股票名与代码对应
                 all_elements.append(await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[1]/div/div/div[2]/table/tbody/tr[{}]/td[position()>2]'.format(i+1)))
                 stock_code = await page.xpath('//*[@id="tableWrap"]/div[2]/div/div[2]/div/table/tbody/tr[{}]/td[3]/div'.format(i+1))
                 # print(await (await all_targets[i].getProperty('textContent')).jsonValue(), ":", end='')
