@@ -117,7 +117,7 @@ class StockAnalyzerTestCase(unittest.TestCase):
 
     def test_pe_fetch(self):
         pe = StockAnalyzer.pe_fetch()
-        self.assertTrue(int(pe) > 0)
+        self.assertTrue(float(pe) > 0)
 
 
 if __name__ == '__main__':
