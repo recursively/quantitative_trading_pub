@@ -57,6 +57,14 @@ class StockAnalyzer():
 
         await browser.close()
 
+    @staticmethod
+    def pe_fetch():
+        res = requests.get(config.pe_url, headers=config.headers)
+        root = etree.HTML(res.content)
+        pe_list = root.xpath('/html/body/div[1]/div[2]/div/div[2]/div[1]/div[3]/div[1]/div/div/div[2]/div/div[2]/div[1]/text()')
+        pe = pe_list[0].split('：')[-1]
+        return pe
+
     def judgement(self):
         raise Exception("judgment not implemented.")
 
@@ -82,15 +90,16 @@ class StockAnalyzer():
 
     def price_calc(self, stocks):
         treasury_yield = 0
-        treasury_dashboard = ''
+        dashboard = ''
+        pe = StockAnalyzer.pe_fetch()
         if type(self).__name__ == 'StockAnalyzerA':
             treasury_yield = StockAnalyzer.treasury_fetch(config.cn_treasury, config.treasury_path)
-            treasury_dashboard = 'Treasury chosen: {:.3f}'.format(treasury_yield)
+            dashboard = 'Treasury chosen: {:.3f}\nShenzhen Stock Exchange PE ratio: {}'.format(treasury_yield, pe)
         if type(self).__name__ == 'StockAnalyzerHK':
             cn_treasury = StockAnalyzer.treasury_fetch(config.cn_treasury, config.treasury_path)
             us_treasury = StockAnalyzer.treasury_fetch(config.us_treasury, config.treasury_path)
             treasury_yield = max(cn_treasury, us_treasury)
-            treasury_dashboard = 'Treasury chosen: {:.3f}  |  cn_treasury: {:.3f}, us_treasury: {:.3f}'.format(treasury_yield, cn_treasury, us_treasury)
+            dashboard = 'Treasury chosen: {:.3f}  |  cn_treasury: {:.3f}, us_treasury: {:.3f}'.format(treasury_yield, cn_treasury, us_treasury)
         info_list = []
         # quote_ctx.get_market_snapshot(['SH.600519', 'SH.600660'])[1][['code', 'last_price', 'pe_ttm_ratio', 'dividend_ttm']].ix[[0]].values[0]
         request_count = 0
@@ -127,7 +136,7 @@ class StockAnalyzer():
                     print('{:<15s} Stock code: {} Last price: {:8.2f} Good price: {:8.2f}  √'.format(stock, info_list[0], info_list[1], self.gprice))
                 else:
                     print('{:<15s} Stock code: {} Last price: {:8.2f} Good price: {:8.2f}'.format(stock, info_list[0], info_list[1], self.gprice))
-            print(treasury_dashboard)
+        print(dashboard)
 
     # def start(self):
     #     loop = asyncio.get_event_loop()

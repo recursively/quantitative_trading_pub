@@ -19,20 +19,22 @@ class StockAnalyzerTestCase(unittest.TestCase):
         self.Analyzer_us = StockAnalyzerUS(config.base_url_US, config.query_US, config.base_url_US, None)
 
     def test_main_filter(self):
-        trial_count = 0
-        trial_confirm = True
+        # trial_count = 0
+        # trial_confirm = True
         try:
             loop = asyncio.get_event_loop()
             loop.run_until_complete(self.Analyzer_cn.iwc_filter())
         except Exception as e:
-            while trial_count < 3 and trial_confirm is True:
-                try:
-                    loop = asyncio.get_event_loop()
-                    loop.run_until_complete(self.Analyzer_cn.iwc_filter())
-                    trial_confirm = False
-                except Exception as e:
-                    trial_count += 1
-                    print('test_main_filter error: ', e)
+            print('test_main_filter error: ', e)
+        # except Exception as e:
+        #     while trial_count < 3 and trial_confirm is True:
+        #         try:
+        #             loop = asyncio.get_event_loop()
+        #             loop.run_until_complete(self.Analyzer_cn.iwc_filter())
+        #             trial_confirm = False
+        #         except Exception as e:
+        #             trial_count += 1
+        #             print('test_main_filter error: ', e)
         self.assertEqual(type(int(self.Analyzer_cn.stock_dict.popitem()[0].split()[-1])), int)
 
     def test_bonus_fetch_cn(self):
@@ -110,7 +112,12 @@ class StockAnalyzerTestCase(unittest.TestCase):
         self.Analyzer_hk.price_calc(['stock 000000'] * 15)
         stop = time.perf_counter()
         self.assertEqual(int(self.Analyzer_cn.gprice), 470)
+        self.assertEqual(int(self.Analyzer_hk.gprice), 470)
         self.assertTrue(stop - start >= 60)
+
+    def test_pe_fetch(self):
+        pe = StockAnalyzer.pe_fetch()
+        self.assertTrue(int(pe) > 0)
 
 
 if __name__ == '__main__':
