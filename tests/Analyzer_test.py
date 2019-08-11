@@ -113,7 +113,7 @@ class StockAnalyzerTestCase(unittest.TestCase):
         stop = time.perf_counter()
         self.assertEqual(int(self.Analyzer_cn.gprice), 470)
         self.assertEqual(int(self.Analyzer_hk.gprice), 470)
-        self.assertTrue(stop - start >= 60)
+        self.assertTrue(stop - start >= 59)
 
     def test_pe_fetch(self):
         pe = StockAnalyzer.pe_fetch()
