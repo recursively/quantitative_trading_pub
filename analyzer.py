@@ -108,29 +108,29 @@ class StockAnalyzer():
                 code = stock.split()[-1]
                 if type(self).__name__ == 'StockAnalyzerA':
                     try:
-                        if request_count > 10:  # 30s内请求10次
+                        if request_count > 9:  # 30s内请求10次
                             print('Delaying 30 seconds to avoid being banned...')
                             time.sleep(30)
-                            request_count = 1
-                        info_list = StockAnalyzer.get_stock_info(quote_ctx, 'SH', code)
+                            request_count = 0
                         request_count += 1
+                        info_list = StockAnalyzer.get_stock_info(quote_ctx, 'SH', code)
                     except Exception as e:
                         try:
-                            if request_count > 10:
+                            if request_count > 9:
                                 print('Delaying 30 seconds to avoid being banned...')
                                 time.sleep(30)
-                                request_count = 1
-                            info_list = StockAnalyzer.get_stock_info(quote_ctx, 'SZ', code)
+                                request_count = 0
                             request_count += 1
+                            info_list = StockAnalyzer.get_stock_info(quote_ctx, 'SZ', code)
                         except Exception as e:
                             pass
                 elif type(self).__name__ == 'StockAnalyzerHK':
-                    if request_count > 10:  # 30s内请求10次
+                    if request_count > 9:  # 30s内请求10次
                         print('Delaying 30 seconds to avoid being banned...')
                         time.sleep(30)
-                        request_count = 1
-                    info_list = StockAnalyzer.get_stock_info(quote_ctx, 'HK', code)
+                        request_count = 0
                     request_count += 1
+                    info_list = StockAnalyzer.get_stock_info(quote_ctx, 'HK', code)
                 self.gprice = min(15 * info_list[1]/info_list[2], 100 * info_list[3]/treasury_yield)
                 if info_list[1] < self.gprice:
                     print('{:<15s} Stock code: {} Last price: {:8.2f} Good price: {:8.2f}  √'.format(stock, info_list[0], info_list[1], self.gprice))
